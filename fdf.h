@@ -24,8 +24,10 @@
 
 # define WIDTH 1400
 # define HEIGHT 900
-# define ZOOM 15
-# define PADDING 200
+# define ZOOM 100
+# define TRUE 1
+# define FALSE 0
+
 typedef enum s_err
 {
 	OPEN_ERR,
@@ -58,25 +60,23 @@ typedef struct s_data
 	int 	endian;
 	int 	width;
 	int 	height;
-	int 	x_start;
-	int 	y_start;
-	int 	z_start;
+	double 	x_start;
+	double 	y_start;
+	double 	z_start;
 	int		color_start;
-	int 	x_cur;
-	int 	y_cur;
-	int 	z_cur;
+	double	x_cur;
+	double	y_cur;
+	double	z_cur;
 	int 	color_cur;
-	int 	x_end;
-	int 	y_end;
-	int 	z_end;
+	double	x_end;
+	double	y_end;
+	double	z_end;
 	int		color_end;
 	double	angle;
 }	t_data;
 
-typedef struct s_coord
-{
+typedef int t_bool;
 
-}	t_coord;
 void	fill_map(char *mappath, t_data *data);
 void	fill_color_map(char **splitted, t_data *data, int row);
 
@@ -237,6 +237,77 @@ function drawLine(x0,y0,x1,y1) is
     end if
 end function
 
+
+ void draw_line_antialias(
+  image img,
+  unsigned int x1, unsigned int y1,
+  unsigned int x2, unsigned int y2,
+  color_component r,
+  color_component g,
+  color_component b )
+{
+  double dx = (double)x2 - (double)x1;
+  double dy = (double)y2 - (double)y1;
+  if ( fabs(dx) > fabs(dy) ) {
+    if ( x2 < x1 ) {
+      swap_(x1, x2);
+      swap_(y1, y2);
+    }
+    double gradient = dy / dx;
+    double xend = round_(x1);
+    double yend = y1 + gradient*(xend - x1);
+    double xgap = rfpart_(x1 + 0.5);
+    int xpxl1 = xend;
+    int ypxl1 = ipart_(yend);
+    plot_(xpxl1, ypxl1, rfpart_(yend)*xgap);
+    plot_(xpxl1, ypxl1+1, fpart_(yend)*xgap);
+    double intery = yend + gradient;
+
+    xend = round_(x2);
+    yend = y2 + gradient*(xend - x2);
+    xgap = fpart_(x2+0.5);
+    int xpxl2 = xend;
+    int ypxl2 = ipart_(yend);
+    plot_(xpxl2, ypxl2, rfpart_(yend) * xgap);
+    plot_(xpxl2, ypxl2 + 1, fpart_(yend) * xgap);
+
+    int x;
+    for(x=xpxl1+1; x < xpxl2; x++) {
+      plot_(x, ipart_(intery), rfpart_(intery));
+      plot_(x, ipart_(intery) + 1, fpart_(intery));
+      intery += gradient;
+    }
+  } else {
+    if ( y2 < y1 ) {
+      swap_(x1, x2);
+      swap_(y1, y2);
+    }
+    double gradient = dx / dy;
+    double yend = round_(y1);
+    double xend = x1 + gradient*(yend - y1);
+    double ygap = rfpart_(y1 + 0.5);
+    int ypxl1 = yend;
+    int xpxl1 = ipart_(xend);
+    plot_(xpxl1, ypxl1, rfpart_(xend)*ygap);
+    plot_(xpxl1 + 1, ypxl1, fpart_(xend)*ygap);
+    double interx = xend + gradient;
+
+    yend = round_(y2);
+    xend = x2 + gradient*(yend - y2);
+    ygap = fpart_(y2+0.5);
+    int ypxl2 = yend;
+    int xpxl2 = ipart_(xend);
+    plot_(xpxl2, ypxl2, rfpart_(xend) * ygap);
+    plot_(xpxl2 + 1, ypxl2, fpart_(xend) * ygap);
+
+    int y;
+    for(y=ypxl1+1; y < ypxl2; y++) {
+      plot_(ipart_(interx), y, rfpart_(interx));
+      plot_(ipart_(interx) + 1, y, fpart_(interx));
+      interx += gradient;
+    }
+  }
+}
  */
 
 
