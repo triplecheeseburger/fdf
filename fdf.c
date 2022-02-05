@@ -86,20 +86,67 @@ void	dd_swap(double *a, double *b, double *c, double *d)
 	*c = *d;
 	*d = temp;
 }
-int	calc_color(double c)
+
+static double	ft_percent(int start, int end, int current)
+{
+	double	plac;
+	double	dist;
+
+	plac = current - start;
+	dist = end - start;
+	if (dist == 0)
+		return (1.0);
+	return ((plac / dist));
+}
+
+static int	ft_get_light(int start, int end, double percent)
+{
+	return ((int)((1 - percent) * start + percent * end));
+}
+
+void	ft_get_color(t_data *data)
+{
+	int		r;
+	int		g;
+	int		b;
+	double	percent;
+
+//	if (data->color_cur == data->color_end)
+//		return (data->color_cur);
+//	if (x > y)
+//	percent = ft_percent(data->x_start, data->x_end, data->x_cur);
+//	else
+		percent = ft_percent(data->y_start, data->y_end, data->y_cur);
+	r = ft_get_light((data->color_start >> 16) & 0xFF, (data->color_end >> 16)
+												& 0xFF, percent);
+	g = ft_get_light((data->color_start >> 8) & 0xFF, (data->color_end >> 8)
+											   & 0xFF, percent);
+	b = ft_get_light(data->color_start & 0xFF, data->color_end & 0xFF, percent);
+	data->color_cur = ((r << 16) | (g << 8) | b);
+}
+
+int	calc_color(t_data *data, double c)
 {
 	int color;
-	int	temp;
+	int	r;
+	int g;
+	int b;
 
-	temp = (int)(c * 256);
-	if (temp > 255)
-		temp = 255;
-	color = 0;
-	color += temp << 16;
-	color += temp << 8;
-	color += temp;
+	r = (int)(c * (data->color_cur >> 16 & 0xFF));
+	if (r > 255)
+		r = 255;
+	g = (int)(c * (data->color_cur >> 8 & 0xFF));
+	if (g > 255)
+		g = 255;
+	b = (int)(c * (data->color_cur & 0xFF));
+	if (b > 255)
+		b = 255;
+	color = r << 16;
+	color += g << 8;
+	color += b;
 	return (color);
 }
+
 void	xiaoline(t_data *data, double dx, double dy)
 {
 	double	gradient;
@@ -107,11 +154,6 @@ void	xiaoline(t_data *data, double dx, double dy)
 	double	yend;
 	double	gap;
 	double	inter;
-	int		xpxl1;
-	int 	ypxl1;
-	int 	xpxl2;
-	int 	ypxl2;
-	//int 	index;
 
 	dx = data->x_end - data->x_start;
 	dy = data->y_end - data->y_start;
@@ -120,25 +162,22 @@ void	xiaoline(t_data *data, double dx, double dy)
 		if (data->x_end < data->x_start)
 			dd_swap(&data->x_start, &data->x_end, &data->y_start, &data->y_end);
 		gradient = dy / dx;
-		xend = (int)(data->x_start + 0.5);
-		yend = data->y_start + gradient * (xend - data->x_start);
+		data->x_cur = (int)(data->x_start + 0.5);
+		data->y_cur = data->y_start + gradient * (data->x_cur - data->x_start);
 		gap = rf_part(data->x_start + 0.5);
-		xpxl1 = xend;
-		ypxl1 = (int)yend;
-		plot_dot(data, xpxl1, ypxl1, calc_color(rf_part(yend) * gap));
-		plot_dot(data, xpxl1, ypxl1 + 1, calc_color(f_part(yend) * gap));
-		inter = yend + gradient;
+		plot_dot(data, data->x_cur, data->y_cur, calc_color(data, rf_part(data->y_cur) * gap));
+		plot_dot(data, data->x_cur, data->y_cur + 1, calc_color(data, f_part(data->y_cur) * gap));
+		inter = data->y_cur + gradient;
 		xend = (int)(data->x_end + 0.5);
 		yend = data->y_end + gradient * (xend - data->x_end);
 		gap = f_part(data->x_end + 0.5);
-		xpxl2 = xend;
-		ypxl2 = (int)yend;
-		plot_dot(data, xpxl2, ypxl2, calc_color(rf_part(yend) * gap));
-		plot_dot(data, xpxl2, ypxl2 + 1, calc_color(f_part(yend) * gap));
-		for (int x = xpxl1 + 1; x < xpxl2; x++)
+//		plot_dot(data, xend, yend, calc_color(rf_part(yend) * gap));
+//		plot_dot(data, xend, yend + 1, calc_color(f_part(yend) * gap));
+		while (data->x_cur++ < xend)
 		{
-			plot_dot(data, x, (int)inter, calc_color(rf_part(inter)));
-			plot_dot(data, x, (int)inter + 1, calc_color(f_part(inter)));
+			ft_get_color(data);
+			plot_dot(data, data->x_cur, inter, calc_color(data, rf_part(inter)));
+			plot_dot(data, data->x_cur, inter + 1, calc_color(data, f_part(inter)));
 			inter += gradient;
 		}
 	}
@@ -147,25 +186,22 @@ void	xiaoline(t_data *data, double dx, double dy)
 		if (data->y_end < data->y_start)
 			dd_swap(&data->x_start, &data->x_end, &data->y_start, &data->y_end);
 		gradient = dx / dy;
-		yend = (int)(data->y_start + 0.5);
-		xend = data->x_start + gradient * (yend - data->y_start);
+		data->y_cur = (int)(data->y_start + 0.5);
+		data->x_cur = data->x_start + gradient * (data->y_cur - data->y_start);
 		gap = rf_part(data->y_start + 0.5);
-		ypxl1 = yend;
-		xpxl1 = (int)xend;
-		plot_dot(data, xpxl1, ypxl1, calc_color(rf_part(yend) * gap));
-		plot_dot(data, xpxl1 + 1, ypxl1, calc_color(f_part(yend) * gap));
-		inter = xend + gradient;
+		plot_dot(data, data->x_cur, data->y_cur, calc_color(data, rf_part(data->y_cur) * gap));
+		plot_dot(data, data->x_cur + 1, data->y_cur, calc_color(data, f_part(data->y_cur) * gap));
+		inter = data->x_cur + gradient;
 		yend = (int)(data->y_end + 0.5);
 		xend = data->y_end + gradient * (yend - data->x_end);
 		gap = f_part(data->y_end + 0.5);
-		ypxl2 = yend;
-		xpxl2 = (int)xend;
-		plot_dot(data, xpxl2, ypxl2, calc_color(rf_part(xend) * gap));
-		plot_dot(data, xpxl2 + 1, ypxl2, calc_color(f_part(xend) * gap));
-		for (int y = ypxl1 + 1; y < ypxl2; y++)
+//		plot_dot(data, xend, yend, calc_color(rf_part(xend) * gap));
+//		plot_dot(data, xend + 1, yend, calc_color(f_part(xend) * gap));
+		while (data->y_cur++ < yend)
 		{
-			plot_dot(data, (int)inter, y, calc_color(rf_part(inter)));
-			plot_dot(data, (int)inter + 1, y, calc_color(f_part(inter)));
+			ft_get_color(data);
+			plot_dot(data, inter, data->y_cur, calc_color(data, rf_part(inter)));
+			plot_dot(data, inter + 1, data->y_cur, calc_color(data, f_part(inter)));
 			inter += gradient;
 		}
 	}

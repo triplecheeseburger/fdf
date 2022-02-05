@@ -24,7 +24,7 @@
 
 # define WIDTH 1400
 # define HEIGHT 900
-# define ZOOM 500
+# define ZOOM 50
 # define TRUE 1
 # define FALSE 0
 
@@ -64,9 +64,9 @@ typedef struct s_data
 	double 	y_start;
 	double 	z_start;
 	int		color_start;
-	double	x_cur;
-	double	y_cur;
-	double	z_cur;
+	int 	x_cur;
+	int 	y_cur;
+	int 	z_cur;
 	int 	color_cur;
 	double	x_end;
 	double	y_end;
