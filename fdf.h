@@ -24,7 +24,7 @@
 
 # define WIDTH 1400
 # define HEIGHT 900
-# define ZOOM 100
+# define ZOOM 500
 # define TRUE 1
 # define FALSE 0
 
@@ -237,6 +237,10 @@ function drawLine(x0,y0,x1,y1) is
     end if
 end function
 
+#define ipart_(X) ((int)(X))
+#define round_(X) ((int)(((double)(X))+0.5))
+#define fpart_(X) (((double)(X))-(double)ipart_(X))
+#define rfpart_(X) (1.0-fpart_(X))
 
  void draw_line_antialias(
   image img,

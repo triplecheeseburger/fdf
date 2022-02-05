@@ -52,18 +52,11 @@ void	set_end(t_data *data, int x, int y)
 	data->y_end += (HEIGHT + data->height * ZOOM) / 2.0;
 }
 
-// data->addr[x * data->bpp / 8 + y * data->size_line] = data->color?;
-
 int ft_abs(int n)
 {
 	if (n < 0)
 		return (-n);
 	return (n);
-}
-
-void	draw_line(t_data *data)
-{
-	data->addr[(int)data->x_start + (int)data->y_start * data->size_line / 4] = data->color_start;
 }
 
 void	plot_dot(t_data *data, int x, int y, int color)
@@ -99,7 +92,6 @@ int	calc_color(double c)
 	int	temp;
 
 	temp = (int)(c * 256);
-	temp = temp * 10 / 10;
 	if (temp > 255)
 		temp = 255;
 	color = 0;
@@ -110,70 +102,214 @@ int	calc_color(double c)
 }
 void	xiaoline(t_data *data, double dx, double dy)
 {
-	t_bool	steep;
 	double	gradient;
-	steep = fabs(data->y_end - data->y_start) > fabs(data->x_end - data->x_start);
-	if (steep == TRUE)
-		dd_swap(&data->x_start, &data->y_start, &data->x_end, &data->y_end);
-	if (data->x_start > data->x_end)
-		dd_swap(&data->x_start, &data->x_end, &data->y_start, &data->y_end);
+	double	xend;
+	double	yend;
+	double	gap;
+	double	inter;
+	int		xpxl1;
+	int 	ypxl1;
+	int 	xpxl2;
+	int 	ypxl2;
+	//int 	index;
+
 	dx = data->x_end - data->x_start;
 	dy = data->y_end - data->y_start;
-	if (dx == 0.0)
-		gradient = 1.0;
-	else
+	if (fabs(dx) > fabs(dy))
+	{
+		if (data->x_end < data->x_start)
+			dd_swap(&data->x_start, &data->x_end, &data->y_start, &data->y_end);
 		gradient = dy / dx;
-	int xend = (int)floor(data->x_start + 0.5);
-	double yend = (int)(data->y_start + gradient * (xend - data->x_start));
-	double xgap = rf_part(data->x_start + 0.5);
-	int xpxl1 = xend;
-	int ypxl1 = (int)floor(yend);
-	if (steep == TRUE)
-	{
-		plot_dot(data, ypxl1, xpxl1, calc_color(rf_part(yend) * xgap));
-		plot_dot(data, ypxl1 + 1, xpxl1, calc_color(f_part(yend) * xgap));
-	}
-	else
-	{
-		plot_dot(data, xpxl1, ypxl1, calc_color(rf_part(yend) * xgap));
-		plot_dot(data, xpxl1, ypxl1 + 1, calc_color(f_part(yend) * xgap));
-	}
-	double intery = yend + gradient;
-
-	xend = (int)floor(data->x_end + 0.5);
-	yend = (int)(data->y_end + gradient * (xend - data->x_end));
-	xgap = f_part(data->x_end + 0.5);
-	int xpxl2 = xend;
-	int ypxl2 = (int)floor(yend);
-	if (steep == TRUE)
-	{
-		plot_dot(data, ypxl2, xpxl2, calc_color(rf_part(yend) * xgap));
-		plot_dot(data, ypxl2 + 1, xpxl2, calc_color(f_part(yend) * xgap));
-	}
-	else
-	{
-		plot_dot(data, xpxl2, ypxl2, calc_color(rf_part(yend) * xgap));
-		plot_dot(data, xpxl2, ypxl2 + 1, calc_color(f_part(yend) * xgap));
-	}
-	if (steep == TRUE)
-	{
-		for (int x = xpxl1 + 1; x < xpxl2 - 1; x++)
+		xend = (int)(data->x_start + 0.5);
+		yend = data->y_start + gradient * (xend - data->x_start);
+		gap = rf_part(data->x_start + 0.5);
+		xpxl1 = xend;
+		ypxl1 = (int)yend;
+		plot_dot(data, xpxl1, ypxl1, calc_color(rf_part(yend) * gap));
+		plot_dot(data, xpxl1, ypxl1 + 1, calc_color(f_part(yend) * gap));
+		inter = yend + gradient;
+		xend = (int)(data->x_end + 0.5);
+		yend = data->y_end + gradient * (xend - data->x_end);
+		gap = f_part(data->x_end + 0.5);
+		xpxl2 = xend;
+		ypxl2 = (int)yend;
+		plot_dot(data, xpxl2, ypxl2, calc_color(rf_part(yend) * gap));
+		plot_dot(data, xpxl2, ypxl2 + 1, calc_color(f_part(yend) * gap));
+		for (int x = xpxl1 + 1; x < xpxl2; x++)
 		{
-			plot_dot(data, (int)floor(intery), x, calc_color(rf_part(intery)));
-			plot_dot(data, (int)floor(intery) + 1, x, calc_color(f_part(intery)));
-			intery = intery + gradient;
+			plot_dot(data, x, (int)inter, calc_color(rf_part(inter)));
+			plot_dot(data, x, (int)inter + 1, calc_color(f_part(inter)));
+			inter += gradient;
 		}
 	}
 	else
 	{
-		for (int x = xpxl1 + 1; x < xpxl2 - 1; x++)
+		if (data->y_end < data->y_start)
+			dd_swap(&data->x_start, &data->x_end, &data->y_start, &data->y_end);
+		gradient = dx / dy;
+		yend = (int)(data->y_start + 0.5);
+		xend = data->x_start + gradient * (yend - data->y_start);
+		gap = rf_part(data->y_start + 0.5);
+		ypxl1 = yend;
+		xpxl1 = (int)xend;
+		plot_dot(data, xpxl1, ypxl1, calc_color(rf_part(yend) * gap));
+		plot_dot(data, xpxl1 + 1, ypxl1, calc_color(f_part(yend) * gap));
+		inter = xend + gradient;
+		yend = (int)(data->y_end + 0.5);
+		xend = data->y_end + gradient * (yend - data->x_end);
+		gap = f_part(data->y_end + 0.5);
+		ypxl2 = yend;
+		xpxl2 = (int)xend;
+		plot_dot(data, xpxl2, ypxl2, calc_color(rf_part(xend) * gap));
+		plot_dot(data, xpxl2 + 1, ypxl2, calc_color(f_part(xend) * gap));
+		for (int y = ypxl1 + 1; y < ypxl2; y++)
 		{
-			plot_dot(data, x, (int)floor(intery), calc_color(rf_part(intery)));
-			plot_dot(data, x, (int)floor(intery) + 1, calc_color(f_part(intery)));
-			intery = intery + gradient;
+			plot_dot(data, (int)inter, y, calc_color(rf_part(inter)));
+			plot_dot(data, (int)inter + 1, y, calc_color(f_part(inter)));
+			inter += gradient;
 		}
 	}
 }
+
+//int	ft_comper(int a, int b)
+//{
+//	if (a < b)
+//		return (1);
+//	return (-1);
+//}
+//static double	ft_percent(int start, int end, int current)
+//{
+//	double	plac;
+//	double	dist;
+//
+//	plac = current - start;
+//	dist = end - start;
+//	if (dist == 0)
+//		return (1.0);
+//	return ((plac / dist));
+//}
+//
+//static int	ft_get_light(int start, int end, double percent)
+//{
+//	return ((int)((1 - percent) * start + percent * end));
+//}
+//
+//unsigned int	ft_get_color(t_data *data, int x, int y)
+//{
+//	int		r;
+//	int		g;
+//	int		b;
+//	double	percent;
+//
+//	if (data->color_cur == data->color_end)
+//		return (data->color_cur);
+//	if (x > y)
+//		percent = ft_percent(data->x_start, data->x_end, data->x_cur);
+//	else
+//		percent = ft_percent(data->y_start, data->y_end, data->y_cur);
+//	r = ft_get_light((data->color_start >> 16) & 0xFF, (data->color_end >> 16)
+//												& 0xFF, percent);
+//	g = ft_get_light((data->color_start >> 8) & 0xFF, (data->color_end >> 8)
+//											   & 0xFF, percent);
+//	b = ft_get_light(data->color_start & 0xFF, data->color_end & 0xFF, percent);
+//	return (((r << 16) | (g << 8) | b));
+//}
+//
+//static void	ft_draw_line(t_data *data, int sx, int sy)
+//{
+//	int	x;
+//	int	y;
+//	int	tmp[2];
+//
+//	x = ft_abs(data->x_end - data->x_start);
+//	y = ft_abs(data->y_end - data->y_start);
+//	sx = ft_comper(data->x_start, data->x_end);
+//	sy = ft_comper(data->y_start, data->y_end);
+//	tmp[0] = x - y;
+//	while (0 < (int)(data->x_cur + data->y_cur * data->size_line / 4) && (int)(data->x_cur + data->y_cur * data->size_line / 4) < WIDTH * HEIGHT)
+//	{
+//		data->color_cur = ft_get_color(data, x, y);
+//		data->addr[(int)(data->x_cur + data->y_cur * data->size_line / 4)] = data->color_cur;
+//		tmp[1] = tmp[0] * 2;
+//		if (tmp[1] > -y)
+//		{
+//			tmp[0] -= y;
+//			data->x_cur += sx;
+//		}
+//		if (tmp[1] < x)
+//		{
+//			tmp[0] += x;
+//			data->y_cur += sy;
+//		}
+//	}
+//}
+
+//void	xiaoline(t_data *data, double dx, double dy)
+//{
+//	t_bool	steep;
+//	double	gradient;
+//	steep = fabs(data->y_end - data->y_start) > fabs(data->x_end - data->x_start);
+//	if (steep == TRUE)
+//		dd_swap(&data->x_start, &data->y_start, &data->x_end, &data->y_end);
+//	if (data->x_start > data->x_end)
+//		dd_swap(&data->x_start, &data->x_end, &data->y_start, &data->y_end);
+//	dx = data->x_end - data->x_start;
+//	dy = data->y_end - data->y_start;
+//	if (dx == 0.0)
+//		gradient = 1.0;
+//	else
+//		gradient = dy / dx;
+//	int xend = (int)floor(data->x_start + 0.5);
+//	double yend = (int)(data->y_start + gradient * (xend - data->x_start));
+//	double xgap = rf_part(data->x_start + 0.5);
+//	int xpxl1 = xend;
+//	int ypxl1 = (int)floor(yend);
+//	if (steep == TRUE)
+//	{
+//		plot_dot(data, ypxl1, xpxl1, calc_color(rf_part(yend) * xgap));
+//		plot_dot(data, ypxl1 + 1, xpxl1, calc_color(f_part(yend) * xgap));
+//	}
+//	else
+//	{
+//		plot_dot(data, xpxl1, ypxl1, calc_color(rf_part(yend) * xgap));
+//		plot_dot(data, xpxl1, ypxl1 + 1, calc_color(f_part(yend) * xgap));
+//	}
+//	double intery = yend + gradient;
+//
+//	xend = (int)floor(data->x_end + 0.5);
+//	yend = (int)(data->y_end + gradient * (xend - data->x_end));
+//	xgap = f_part(data->x_end + 0.5);
+//	int xpxl2 = xend;
+//	int ypxl2 = (int)floor(yend);
+//	if (steep == TRUE)
+//	{
+//		plot_dot(data, ypxl2, xpxl2, calc_color(rf_part(yend) * xgap));
+//		plot_dot(data, ypxl2 + 1, xpxl2, calc_color(f_part(yend) * xgap));
+//	}
+//	else
+//	{
+//		plot_dot(data, xpxl2, ypxl2, calc_color(rf_part(yend) * xgap));
+//		plot_dot(data, xpxl2, ypxl2 + 1, calc_color(f_part(yend) * xgap));
+//	}
+//	if (steep == TRUE)
+//	{
+//		for (int x = xpxl1 + 1; x < xpxl2 - 1; x++)
+//		{
+//			plot_dot(data, (int)floor(intery), x, calc_color(rf_part(intery)));
+//			plot_dot(data, (int)floor(intery) + 1, x, calc_color(f_part(intery)));
+//			intery = intery + gradient;
+//		}
+//	}
+//	else
+//	{
+//		for (int x = xpxl1 + 1; x < xpxl2 - 1; x++)
+//		{
+//			plot_dot(data, x, (int)floor(intery), calc_color(rf_part(intery)));
+//			plot_dot(data, x, (int)floor(intery) + 1, calc_color(f_part(intery)));
+//			intery = intery + gradient;
+//		}
+//	}
+//}
 
 void	draw_image(t_data *data)
 {
@@ -190,14 +326,14 @@ void	draw_image(t_data *data)
 			{
 				set_start(data, x, y);
 				set_end(data, x + 1, y);
-				//draw_line(data);
+//				ft_draw_line(data, 0, 0);
 				xiaoline(data, 0, 0);
 			}
 			if (y < data->height - 1)
 			{
 				set_start(data, x, y);
 				set_end(data, x, y + 1);
-				//draw_line(data);
+//				ft_draw_line(data, 0, 0);
 				xiaoline(data, 0, 0);
 			}
 		}
