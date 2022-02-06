@@ -37,7 +37,7 @@ void	*ft_free_str(char *str)
 
 void	*ft_free_splitted(char **splitted)
 {
-	int index;
+	int	index;
 
 	index = 0;
 	while (splitted[index] != 0)
@@ -46,4 +46,3 @@ void	*ft_free_splitted(char **splitted)
 	splitted = 0;
 	return (0);
 }
-
