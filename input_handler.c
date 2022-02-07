@@ -14,9 +14,14 @@
 
 static void	re_init_data(t_data *data)
 {
+	data->z_gap = data->z_max - data->z_min;
 	data->zoom = 30;
-	while (WIDTH * data->zoom * HEIGHT * data->zoom > WIDTH * HEIGHT * 3)
+	while ((data->width + data->z_gap) * data->zoom \
+		* (data->height + data->z_gap) * data->zoom \
+		> (WIDTH + 10 * data->zoom) * (HEIGHT + 10 * data->zoom) / 3.0)
+	{
 		data->zoom /= 1.1;
+	}
 	data->cflag = FALSE;
 	data->pflag = FALSE;
 	data->menu = FALSE;
@@ -40,6 +45,8 @@ static int	fdf_toggle(int button)
 
 static void	key_press3(int keycode, t_data *data)
 {
+	if (keycode == 46)
+		data->menu = fdf_toggle(data->menu);
 	if (keycode == 34)
 		data->projection = ISOMETRIC;
 	if (keycode == 31)
@@ -64,8 +71,8 @@ static void	key_press3(int keycode, t_data *data)
 
 static void	key_press2(int keycode, t_data *data)
 {
-	if (keycode == 46)
-		data->menu = fdf_toggle(data->menu);
+	if (keycode == 17)
+		data->tflag = fdf_toggle(data->tflag);
 	if (keycode == 5)
 		data->cflag = fdf_toggle(data->cflag);
 	if (keycode == 4)
@@ -108,10 +115,10 @@ int	key_press(int keycode, t_data *data)
 		data->zoom /= 1.1;
 	if (keycode == 24)
 		data->zoom *= 1.1;
-	if (keycode == 25 && data->zdepth > 1)
-		data->zdepth -= 1;
+	if (keycode == 25)
+		data->zdepth /= 1.1;
 	if (keycode == 29)
-		data->zdepth += 1;
+		data->zdepth *= 1.1;
 	key_press2(keycode, data);
 	key_press3(keycode, data);
 	draw_image(data, 0, 0);

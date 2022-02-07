@@ -26,7 +26,7 @@ static void	draw_background(t_data *data)
 
 	index = -1;
 	while (++index < WIDTH * HEIGHT)
-		data->addr[index] = 0x111111;
+		data->addr[index] = 0x0A0A0A;
 }
 
 static void	draw_menu(t_data *data)
@@ -46,7 +46,7 @@ static void	draw_line(t_data *data)
 	if (data->anti == TRUE)
 		xiaoline(data, 0, 0);
 	else
-		bresenham(data, 0, 0);
+		dda(data, 0, 0);
 }
 
 void	draw_image(t_data *data, int x, int y)

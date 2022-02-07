@@ -53,14 +53,16 @@ typedef struct s_data
 	int		bpp;
 	int		size_ln;
 	int		endian;
-	int		anti;
 	int		menu;
+	int		anti;
+	int		tflag;
 	int		cflag;
 	int		pflag;
 	int		projection;
 	int		color;
 	int		width;
 	int		height;
+	int		swapped;
 	double	grad;
 	double	x_st;
 	double	y_st;
@@ -108,8 +110,9 @@ void	plot(t_data *data, int x, int y, double c);
 void	get_color(t_data *data, double c);
 void	get_preset_color(t_data *data, double z_cur, int *color);
 void	get_default_color(t_data *data, double z_cur, int *color);
+
 void	xiaoline(t_data *data, double dx, double dy);
-void	bresenham(t_data *data, double dx, double dy);
+void	dda(t_data *data, double dx, double dy);
 
 void	select_projection(t_data *data, double *x, double *y, double *z);
 void	set_start(t_data *data, int x, int y);

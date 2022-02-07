@@ -27,7 +27,10 @@ static void	dd_swap(double *a, double *b, double *c, double *d)
 static void	when_dx_greater(t_data *data, t_line *line, double dx, double dy)
 {
 	if (data->x_ed < data->x_st)
+	{
 		dd_swap(&data->x_st, &data->x_ed, &data->y_st, &data->y_ed);
+		data->swapped = TRUE;
+	}
 	line->gradient = dy / dx;
 	data->x_cur = (int)(data->x_st + 0.5);
 	data->y_cur = data->y_st + line->gradient * (data->x_cur - data->x_st);
@@ -46,12 +49,16 @@ static void	when_dx_greater(t_data *data, t_line *line, double dx, double dy)
 		plot(data, data->x_cur, data->y_cur + 1, f_part(data->y_cur));
 		data->y_cur += line->gradient;
 	}
+	data->swapped = FALSE;
 }
 
 static void	when_dx_lesser(t_data *data, t_line *line, double dx, double dy)
 {
 	if (data->y_ed < data->y_st)
+	{
 		dd_swap(&data->x_st, &data->x_ed, &data->y_st, &data->y_ed);
+		data->swapped = TRUE;
+	}
 	line->gradient = dx / dy;
 	data->y_cur = (int)(data->y_st + 0.5);
 	data->x_cur = data->x_st + line->gradient * (data->y_cur - data->y_st);
@@ -70,6 +77,7 @@ static void	when_dx_lesser(t_data *data, t_line *line, double dx, double dy)
 			f_part(data->x_cur));
 		data->x_cur += line->gradient;
 	}
+	data->swapped = FALSE;
 }
 
 void	xiaoline(t_data *data, double dx, double dy)
@@ -86,4 +94,29 @@ void	xiaoline(t_data *data, double dx, double dy)
 		when_dx_greater(data, &line, dx, dy);
 	else
 		when_dx_lesser(data, &line, dx, dy);
+}
+
+void	dda(t_data *data, double dx, double dy)
+{
+	double	step;
+	double	x_step;
+	double	y_step;
+	int		i;
+
+	dx = data->x_ed - data->x_st;
+	dy = data->y_ed - data->y_st;
+	if (fabs(dx) > fabs(dy))
+		step = fabs(dx);
+	else
+		step = fabs(dy);
+	x_step = dx / step;
+	y_step = dy / step;
+	i = 0;
+	while (i <= step)
+	{
+		plot(data, data->x_cur, data->y_cur, 1);
+		data->x_cur += x_step;
+		data->y_cur += y_step;
+		++i;
+	}
 }

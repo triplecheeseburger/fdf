@@ -19,7 +19,7 @@ static double	get_percent(double start, double end, double current)
 
 	offset = current - start;
 	distance = end - start;
-	if (0 <= distance && distance < 0.0001)
+	if (0 <= distance && distance < 0.00001)
 		return (1.0);
 	return (offset / distance);
 }
@@ -84,7 +84,7 @@ void	get_color(t_data *data, double c)
 		perc = get_percent(data->x_st, data->x_ed, data->x_cur);
 	else
 		perc = get_percent(data->y_st, data->y_ed, data->y_cur);
-	if (data->z_st < data->z_ed)
+	if (data->anti == TRUE && data->swapped == TRUE)
 		perc = 1 - perc;
 	r = (1.0 - perc) * ((data->clr_st >> 16) & 0xFF) \
 		+ ((data->clr_ed >> 16) & 0xFF) * perc;
@@ -93,5 +93,6 @@ void	get_color(t_data *data, double c)
 	b = (1.0 - perc) * (data->clr_st & 0xFF) \
 		+ (data->clr_ed & 0xFF) * perc;
 	data->clr_cur = (r << 16) + (g << 8) + b;
-	calc_color(data->clr_cur, c);
+	if (data->tflag == FALSE)
+		data->clr_cur = calc_color(data->clr_cur, c);
 }

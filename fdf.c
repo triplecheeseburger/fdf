@@ -17,6 +17,7 @@ static void	init_data(t_data *data)
 	data->width = 0;
 	data->height = 0;
 	data->anti = FALSE;
+	data->tflag = FALSE;
 	data->cflag = FALSE;
 	data->pflag = FALSE;
 	data->menu = FALSE;
@@ -31,6 +32,7 @@ static void	init_data(t_data *data)
 	data->x_ang = 0;
 	data->y_ang = 0;
 	data->z_ang = 0;
+	data->swapped = FALSE;
 }
 
 static void	init_data_sequal(t_data *data)
@@ -39,7 +41,7 @@ static void	init_data_sequal(t_data *data)
 	data->zoom = 30;
 	while ((data->width + data->z_gap) * data->zoom \
 		* (data->height + data->z_gap) * data->zoom \
-		> (WIDTH + 10 * data->zoom) * (HEIGHT + 10 * data->zoom) / 3.0)
+		> (WIDTH + 20 * data->zoom) * (HEIGHT + 20 * data->zoom) / 3.0)
 	{
 		data->zoom /= 1.1;
 	}
