@@ -24,10 +24,9 @@
 
 # define WIDTH 1400
 # define HEIGHT 900
-# define ZOOM 25
+# define MENU 300
 # define TRUE 1
 # define FALSE 0
-# define ZDEPTH 3
 
 typedef enum s_err
 {
@@ -35,17 +34,12 @@ typedef enum s_err
 	MALLOC_ERR
 }	t_err;
 
-typedef enum s_direction
-{
-	VERTICAL,
-	HORIZONTAL
-}	t_direction;
-
 typedef enum s_projection
 {
-	ISOMETRIC,
 	PARALLEL,
-	CONIC
+	ISOMETRIC,
+	DIMETRIC,
+	TRIMETRIC
 }	t_projection;
 
 typedef struct s_data
@@ -53,30 +47,45 @@ typedef struct s_data
 	void	*mlx;
 	void	*window;
 	void	*img;
-	int 	**map;
-	int 	**color_map;
-	int 	*addr;
-	int 	bpp;
-	int 	size_ln;
-	int 	endian;
+	int		**map;
+	int		**color_map;
+	int		*addr;
+	int		bpp;
+	int		size_ln;
+	int		endian;
+	int		anti;
+	int		menu;
 	int		cflag;
-	int 	width;
-	int 	height;
-	double 	x_st;
-	double 	y_st;
-	double 	z_st;
-	int		clr_st;
-	double 	x_cur;
+	int		pflag;
+	int		projection;
+	int		color;
+	int		width;
+	int		height;
+	double	grad;
+	double	x_st;
+	double	y_st;
+	double	z_st;
+	double	x_cur;
 	double	y_cur;
 	double	z_cur;
-	int 	clr_cur;
 	double	x_ed;
 	double	y_ed;
 	double	z_ed;
+	int		clr_st;
+	int		clr_cur;
 	int		clr_ed;
+	int		z_min;
+	int		z_max;
+	int		z_gap;
 	double	angle;
-	int 	z_min;
-	int 	z_max;
+	double	z_rad;
+	double	x_ang;
+	double	y_ang;
+	double	z_ang;
+	double	zoom;
+	double	zdepth;
+	double	x_shift;
+	double	y_shift;
 }	t_data;
 
 typedef struct s_line
@@ -87,26 +96,25 @@ typedef struct s_line
 	double	gap;
 }	t_line;
 
-typedef int t_bool;
+typedef int	t_bool;
 
-int		key_press(int keycode);
-int		red_button(int exitcode);
+int		key_press(int keycode, t_data *data);
 
 void	fill_map(char *mappath, t_data *data);
 void	fill_color_map(char **splitted, t_data *data, int row);
 
-void	draw_image(t_data *data);
+void	draw_image(t_data *data, int x, int y);
 void	plot(t_data *data, int x, int y, double c);
 void	get_color(t_data *data, double c);
+void	get_preset_color(t_data *data, double z_cur, int *color);
 void	get_default_color(t_data *data, double z_cur, int *color);
 void	xiaoline(t_data *data, double dx, double dy);
+void	bresenham(t_data *data, double dx, double dy);
 
-void	project_isometric(double *x, double *y, double *z);
-void	init_data(t_data *data);
+void	select_projection(t_data *data, double *x, double *y, double *z);
 void	set_start(t_data *data, int x, int y);
 void	set_end(t_data *data, int x, int y);
 
-int		ft_abs(int n);
 double	f_part(double x);
 double	rf_part(double x);
 
@@ -115,12 +123,12 @@ void	*ft_free_int(int *arr);
 void	*ft_free_str(char *str);
 void	*ft_free_splitted(char **splitted);
 
-/* for test */
+#endif
+
+/*
+ for test
 void	print_map(t_data *data);
 void	print_color_map(t_data *data);
-
-#endif
-/*
 
 //int	ft_comper(int a, int b)
 //{
@@ -312,6 +320,13 @@ void	when_dx_lesser(t_data *data, t_line *line, double dx, double dy)
 	}
 }
 
+ void	plot(t_data *data, int x, int y, double c)
+{
+	get_color(data, c);
+//	if (0 < x + y * data->size_ln / 4
+//		&& x + y * data->size_ln / 4 < WIDTH * HEIGHT)
+	if (0 <= x && x < WIDTH && 0 <= y && y < WIDTH * HEIGHT / (data->size_ln / 4))
+		data->addr[x + y * data->size_ln / 4] = data->clr_cur;
+}
+
  */
-
-

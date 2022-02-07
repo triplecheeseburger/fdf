@@ -33,9 +33,9 @@ static void	when_dx_greater(t_data *data, t_line *line, double dx, double dy)
 	data->y_cur = data->y_st + line->gradient * (data->x_cur - data->x_st);
 	line->gap = rf_part(data->x_st + 0.5);
 	plot(data, data->x_cur, data->y_cur,
-		 rf_part(data->y_cur) * line->gap);
+		rf_part(data->y_cur) * line->gap);
 	plot(data, data->x_cur, data->y_cur + 1,
-		 f_part(data->y_cur) * line->gap);
+		f_part(data->y_cur) * line->gap);
 	data->y_cur += line->gradient;
 	line->xend = (int)(data->x_ed + 0.5);
 	line->yend = data->y_ed + line->gradient * (line->xend - data->x_ed);
@@ -65,9 +65,9 @@ static void	when_dx_lesser(t_data *data, t_line *line, double dx, double dy)
 	while (data->y_cur++ < line->yend)
 	{
 		plot(data, data->x_cur, data->y_cur,
-			 rf_part(data->x_cur));
+			rf_part(data->x_cur));
 		plot(data, data->x_cur + 1, data->y_cur,
-			 f_part(data->x_cur));
+			f_part(data->x_cur));
 		data->x_cur += line->gradient;
 	}
 }

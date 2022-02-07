@@ -12,37 +12,32 @@
 
 #include "fdf.h"
 
-static double	get_percent(int start, int end, int current)
+static double	get_percent(double start, double end, double current)
 {
-	double	plac;
-	double	dist;
+	double	offset;
+	double	distance;
 
-	plac = current - start;
-	dist = end - start;
-	if (dist == 0)
+	offset = current - start;
+	distance = end - start;
+	if (0 <= distance && distance < 0.0001)
 		return (1.0);
-	return ((plac / dist));
+	return (offset / distance);
 }
 
-static int	get_grade(int start, int end, double percent)
-{
-	return ((int)((1 - percent) * start + percent * end));
-}
-
-static int	calc_color(t_data *data, double c)
+static int	calc_color(int clr_cur, double c)
 {
 	int	color;
 	int	r;
 	int	g;
 	int	b;
 
-	r = (int)(c * (data->clr_cur >> 16 & 0xFF));
+	r = (int)(c * (clr_cur >> 16 & 0xFF));
 	if (r > 255)
 		r = 255;
-	g = (int)(c * (data->clr_cur >> 8 & 0xFF));
+	g = (int)(c * (clr_cur >> 8 & 0xFF));
 	if (g > 255)
 		g = 255;
-	b = (int)(c * (data->clr_cur & 0xFF));
+	b = (int)(c * (clr_cur & 0xFF));
 	if (b > 255)
 		b = 255;
 	color = r << 16;
@@ -51,21 +46,31 @@ static int	calc_color(t_data *data, double c)
 	return (color);
 }
 
-void	get_default_color(t_data *data, double z_cur, int *color)
+void	get_preset_color(t_data *data, double z_cur, int *color)
 {
 	double	percent;
 
 	percent = get_percent(data->z_min, data->z_max, z_cur);
 	if (percent < 0.2)
-		*color = 0x66CC00;
+		*color = 0x00CCFF;
 	else if (percent < 0.4)
-		*color = 0x99FF33;
-	else if (percent < 0.51)
-		*color = 0xB2FF66;
+		*color = 0xCC3333;
+	else if (percent < 0.6)
+		*color = 0x33FF00;
 	else if (percent < 0.8)
-		*color = 0xCCFF99;
+		*color = 0xFFFFCC;
 	else
-		*color = 0xE5FFCC;
+		*color = 0xEF8633;
+}
+
+void	get_default_color(t_data *data, double z_cur, int *color)
+{
+	double	percent;
+
+	z_cur = z_cur * data->grad / (data->zoom / data->zdepth) \
+		+ (data->z_gap) * (1 - data->grad);
+	percent = get_percent(data->z_min, data->z_max, z_cur);
+	*color = calc_color(data->color, percent);
 }
 
 void	get_color(t_data *data, double c)
@@ -73,21 +78,20 @@ void	get_color(t_data *data, double c)
 	int		r;
 	int		g;
 	int		b;
-	double	percent;
+	double	perc;
 
-	if (data->clr_cur == data->clr_ed)
-		return ;
-	if (ft_abs(data->x_ed - data->x_st) > ft_abs(data->y_ed - data->y_st))
-		percent = get_percent(data->x_st, data->x_ed, data->x_cur);
+	if (fabs(data->x_ed - data->x_st) > fabs(data->y_ed - data->y_st))
+		perc = get_percent(data->x_st, data->x_ed, data->x_cur);
 	else
-		percent = get_percent(data->y_st, data->y_ed, data->y_cur);
-	if (data->z_cur < data->z_ed)
-		percent = 1 - percent;
-	r = get_grade((data->clr_st >> 16) & 0xFF, (data->clr_ed >> 16)
-			& 0xFF, percent);
-	g = get_grade((data->clr_st >> 8) & 0xFF, (data->clr_ed >> 8)
-			& 0xFF, percent);
-	b = get_grade(data->clr_st & 0xFF, data->clr_ed & 0xFF, percent);
+		perc = get_percent(data->y_st, data->y_ed, data->y_cur);
+	if (data->z_st < data->z_ed)
+		perc = 1 - perc;
+	r = (1.0 - perc) * ((data->clr_st >> 16) & 0xFF) \
+		+ ((data->clr_ed >> 16) & 0xFF) * perc;
+	g = (1.0 - perc) * ((data->clr_st >> 8) & 0xFF) \
+		+ ((data->clr_ed >> 8) & 0xFF) * perc;
+	b = (1.0 - perc) * (data->clr_st & 0xFF) \
+		+ (data->clr_ed & 0xFF) * perc;
 	data->clr_cur = (r << 16) + (g << 8) + b;
-	calc_color(data, c);
+	calc_color(data->clr_cur, c);
 }

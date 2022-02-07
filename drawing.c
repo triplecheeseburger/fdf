@@ -15,16 +15,43 @@
 void	plot(t_data *data, int x, int y, double c)
 {
 	get_color(data, c);
-	if (0 < x + y * data->size_ln / 4
-		&& x + y * data->size_ln / 4 < WIDTH * HEIGHT)
+	if (0 <= x && x < WIDTH \
+		&& 0 <= y && y < WIDTH * HEIGHT / (data->size_ln / 4))
 		data->addr[x + y * data->size_ln / 4] = data->clr_cur;
 }
 
-void	draw_image(t_data *data)
+static void	draw_background(t_data *data)
 {
-	int		x;
-	int		y;
+	int	index;
 
+	index = -1;
+	while (++index < WIDTH * HEIGHT)
+		data->addr[index] = 0x111111;
+}
+
+static void	draw_menu(t_data *data)
+{
+	int	index;
+
+	index = -1;
+	while (++index < WIDTH * HEIGHT)
+	{
+		if (index % (data->size_ln / 4) < MENU)
+			data->addr[index] = 0x061418;
+	}
+}
+
+static void	draw_line(t_data *data)
+{
+	if (data->anti == TRUE)
+		xiaoline(data, 0, 0);
+	else
+		bresenham(data, 0, 0);
+}
+
+void	draw_image(t_data *data, int x, int y)
+{
+	draw_background(data);
 	y = -1;
 	while (++y < data->height)
 	{
@@ -35,15 +62,17 @@ void	draw_image(t_data *data)
 			{
 				set_start(data, x, y);
 				set_end(data, x + 1, y);
-				xiaoline(data, 0, 0);
+				draw_line(data);
 			}
 			if (y < data->height - 1)
 			{
 				set_start(data, x, y);
 				set_end(data, x, y + 1);
-				xiaoline(data, 0, 0);
+				draw_line(data);
 			}
 		}
 	}
+	if (data->menu == TRUE)
+		draw_menu(data);
 	mlx_put_image_to_window(data->mlx, data->window, data->img, 0, 0);
 }

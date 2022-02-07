@@ -48,7 +48,7 @@ static int	extract_color(char *info)
 	while (info[index] != '\0' && info[index] != '\n')
 	{
 		result *= 16;
-		result += ft_strchr_idx("0123456789ABCDEF", info[index]);
+		result += ft_strchr_idx("0123456789ABCDEF", ft_toupper(info[index]));
 		++index;
 	}
 	return (result);
