@@ -36,13 +36,6 @@ static void	re_init_data(t_data *data)
 	data->z_ang = 0;
 }
 
-static int	fdf_toggle(int button)
-{
-	if (button == TRUE)
-		return (FALSE);
-	return (TRUE);
-}
-
 static void	key_press3(int keycode, t_data *data)
 {
 	if (keycode == 46)

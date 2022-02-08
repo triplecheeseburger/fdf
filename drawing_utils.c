@@ -21,3 +21,10 @@ double	rf_part(double x)
 {
 	return (1 - f_part(x));
 }
+
+int	fdf_toggle(int button)
+{
+	if (button == TRUE)
+		return (FALSE);
+	return (TRUE);
+}

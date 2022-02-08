@@ -120,6 +120,7 @@ void	set_end(t_data *data, int x, int y);
 
 double	f_part(double x);
 double	rf_part(double x);
+int		fdf_toggle(int button);
 
 void	error(int mode);
 void	*ft_free_int(int *arr);

@@ -39,9 +39,9 @@ static void	init_data_sequal(t_data *data)
 {
 	data->z_gap = data->z_max - data->z_min;
 	data->zoom = 30;
-	while ((data->width + data->z_gap) * data->zoom \
-		* (data->height + data->z_gap) * data->zoom \
-		> (WIDTH + 20 * data->zoom) * (HEIGHT + 20 * data->zoom) / 3.0)
+	while ((data->width + data->z_gap) * (int)data->zoom \
+		* (data->height + data->z_gap) * (int)data->zoom \
+		> (WIDTH + 20 * (int)data->zoom) * (HEIGHT + 20 * (int)data->zoom) / 3.0)
 	{
 		data->zoom /= 1.1;
 	}
