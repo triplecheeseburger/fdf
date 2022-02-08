@@ -48,11 +48,31 @@ static void	adjust_gap(t_data *data, double *x, double *y)
 	}
 }
 
+static double	get_zoom(t_data *data)
+{
+	double	zoom;
+
+	if (data->zoom >= 1)
+	{
+		zoom = (int)data->zoom;
+		data->zflag = FALSE;
+	}
+	else
+	{
+		zoom = data->zoom;
+		data->zflag = TRUE;
+	}
+	return (zoom);
+}
+
 void	set_start(t_data *data, int x, int y)
 {
-	data->x_st = x * data->zoom;
-	data->y_st = y * data->zoom;
-	data->z_st = data->map[y][x] * data->zoom / data->zdepth;
+	double	zoom;
+
+	zoom = get_zoom(data);
+	data->x_st = x * zoom;
+	data->y_st = y * zoom;
+	data->z_st = data->map[y][x] * zoom / data->zdepth;
 	if (data->cflag == TRUE)
 		get_default_color(data, data->z_st, &data->clr_st);
 	else if (data->cflag == FALSE && data->pflag == TRUE)
@@ -73,9 +93,12 @@ void	set_start(t_data *data, int x, int y)
 
 void	set_end(t_data *data, int x, int y)
 {
-	data->x_ed = x * data->zoom;
-	data->y_ed = y * data->zoom;
-	data->z_ed = data->map[y][x] * data->zoom / data->zdepth;
+	double	zoom;
+
+	zoom = get_zoom(data);
+	data->x_ed = x * zoom;
+	data->y_ed = y * zoom;
+	data->z_ed = data->map[y][x] * zoom / data->zdepth;
 	if (data->cflag == TRUE)
 		get_default_color(data, data->z_ed, &data->clr_ed);
 	else if (data->cflag == FALSE && data->pflag == TRUE)

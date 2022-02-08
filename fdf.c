@@ -20,7 +20,7 @@ static void	init_data(t_data *data)
 	data->tflag = FALSE;
 	data->cflag = FALSE;
 	data->pflag = FALSE;
-	data->zdflag = FALSE;
+	data->zflag = FALSE;
 	data->menu = FALSE;
 	data->color = 0xFFFFFF;
 	data->z_min = 2147483647;
@@ -40,13 +40,13 @@ static void	init_data_sequal(t_data *data)
 {
 	data->z_gap = data->z_max - data->z_min;
 	data->zoom = 30;
-	while ((data->width + data->z_gap) * (int)data->zoom \
-		* (data->height + data->z_gap) * (int)data->zoom \
-		> (WIDTH + 20 * (int)data->zoom) * (HEIGHT + 20 * (int)data->zoom) / 3.0)
+	while ((data->width + data->z_gap) * data->zoom \
+		* (data->height + data->z_gap) * data->zoom \
+		> (WIDTH + 20 * data->zoom) * (HEIGHT + 20 * data->zoom) / 3.0)
 	{
-		if (data->zoom > 1)
-			data->zoom -= 1;
+		data->zoom /= 1.1;
 	}
+	data->zoom_init = data->zoom;
 }
 
 int	red_button(int exitcode)
@@ -72,4 +72,5 @@ int	main(int ac, char **av)
 			&data.bpp, &data.size_ln, &data.endian);
 	draw_image(&data, 0, 0);
 	mlx_loop(data.mlx);
+	exit(0);
 }

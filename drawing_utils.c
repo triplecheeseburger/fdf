@@ -12,6 +12,14 @@
 
 #include "fdf.h"
 
+void	plot(t_data *data, int x, int y, double c)
+{
+	get_color(data, c);
+	if (0 <= x && x < WIDTH \
+		&& 0 <= y && y < WIDTH * HEIGHT / (data->size_ln / 4))
+		data->addr[x + y * data->size_ln / 4] = data->clr_cur;
+}
+
 double	f_part(double x)
 {
 	return (x - floor(x));

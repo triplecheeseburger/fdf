@@ -20,11 +20,12 @@ static void	re_init_data(t_data *data)
 		* (data->height + data->z_gap) * data->zoom \
 		> (WIDTH + 10 * data->zoom) * (HEIGHT + 10 * data->zoom) / 3.0)
 	{
-		if (data->zoom > 1)
-			data->zoom -= 1;
+		data->zoom /= 1.1;
 	}
+	data->zoom_init = data->zoom;
 	data->cflag = FALSE;
 	data->pflag = FALSE;
+	data->zflag = FALSE;
 	data->menu = FALSE;
 	data->color = 0xFFFFFF;
 	data->zdepth = 1;
@@ -39,14 +40,22 @@ static void	re_init_data(t_data *data)
 
 static void	key_press4(int keycode, t_data *data)
 {
-	if (keycode == 27 && data->zdflag == FALSE)
-		data->zoom -= 1;
-	if (keycode == 24 && data->zoom < 2147483647 && data->zdflag == FALSE)
+	if (keycode == 27 && data->zflag == TRUE)
+		data->zoom /= 1.1;
+	if (keycode == 24 && data->zflag == TRUE)
+	{
+		data->zoom *= 1.1;
+		if (data->zoom > 0.95)
+			data->zoom = data->zoom_init;
+	}
+	if (keycode == 24 && data->zflag == FALSE && data->zoom >= 1)
 		data->zoom += 1;
-	if (keycode == 27 && data->zdflag == TRUE)
-		data->d_zoom /= 1.1;
-	if (keycode == 24 && data->zdflag == TRUE)
-		data->d_zoom *= 1.1;
+	if (keycode == 27 && data->zflag == FALSE && data->zoom >= 1)
+	{
+		data->zoom -= 1;
+		if (data->zoom < 1)
+			data->zoom = 0.940319;
+	}
 	if (keycode == 25)
 		data->zdepth /= 1.1;
 	if (keycode == 29)
@@ -89,17 +98,17 @@ static void	key_press2(int keycode, t_data *data)
 		data->pflag = fdf_toggle(data->pflag);
 	if (keycode == 48)
 		data->anti = fdf_toggle(data->anti);
-	if (keycode == 12 && (data->color >> 16 & 0xFF) < 251)
+	if (keycode == 12 && (data->color >> 16 & 0xFF) < 248)
 		data->color += 8 << 16;
-	if (keycode == 13 && (data->color >> 16 & 0xFF) > 4)
+	if (keycode == 13 && (data->color >> 16 & 0xFF) > 7)
 		data->color -= 8 << 16;
-	if (keycode == 0 && (data->color >> 8 & 0xFF) < 251)
+	if (keycode == 0 && (data->color >> 8 & 0xFF) < 248)
 		data->color += 8 << 8;
-	if (keycode == 1 && (data->color >> 8 & 0xFF) > 4)
+	if (keycode == 1 && (data->color >> 8 & 0xFF) > 7)
 		data->color -= 8 << 8;
-	if (keycode == 6 && (data->color & 0xFF) < 251)
+	if (keycode == 6 && (data->color & 0xFF) < 248)
 		data->color += 8;
-	if (keycode == 7 && (data->color & 0xFF) > 4)
+	if (keycode == 7 && (data->color & 0xFF) > 7)
 		data->color -= 8;
 	if (keycode == 18 && data->grad < 0.95)
 		data->grad += 0.02;
