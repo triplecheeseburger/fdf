@@ -85,6 +85,7 @@ typedef struct s_data
 	double	y_ang;
 	double	z_ang;
 	int		zoom;
+	int 	zdflag;
 	double	zdepth;
 	double	d_zoom;
 	double	x_shift;

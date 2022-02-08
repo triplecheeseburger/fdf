@@ -37,6 +37,22 @@ static void	re_init_data(t_data *data)
 	data->z_ang = 0;
 }
 
+static void	key_press4(int keycode, t_data *data)
+{
+	if (keycode == 27 && data->zdflag == FALSE)
+		data->zoom -= 1;
+	if (keycode == 24 && data->zoom < 2147483647 && data->zdflag == FALSE)
+		data->zoom += 1;
+	if (keycode == 27 && data->zdflag == TRUE)
+		data->d_zoom /= 1.1;
+	if (keycode == 24 && data->zdflag == TRUE)
+		data->d_zoom *= 1.1;
+	if (keycode == 25)
+		data->zdepth /= 1.1;
+	if (keycode == 29)
+		data->zdepth *= 1.1;
+}
+
 static void	key_press3(int keycode, t_data *data)
 {
 	if (keycode == 46)
@@ -105,16 +121,9 @@ int	key_press(int keycode, t_data *data)
 		data->y_shift -= 15;
 	if (keycode == 126)
 		data->y_shift += 15;
-	if (keycode == 27 && data->zoom > 1)
-		data->zoom -= 1;
-	if (keycode == 24 && data->zoom < 2147483647)
-		data->zoom += 1;
-	if (keycode == 25)
-		data->zdepth /= 1.1;
-	if (keycode == 29)
-		data->zdepth *= 1.1;
 	key_press2(keycode, data);
 	key_press3(keycode, data);
+	key_press4(keycode, data);
 	draw_image(data, 0, 0);
 	return (0);
 }

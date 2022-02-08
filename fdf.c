@@ -20,6 +20,7 @@ static void	init_data(t_data *data)
 	data->tflag = FALSE;
 	data->cflag = FALSE;
 	data->pflag = FALSE;
+	data->zdflag = FALSE;
 	data->menu = FALSE;
 	data->color = 0xFFFFFF;
 	data->z_min = 2147483647;
