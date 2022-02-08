@@ -20,7 +20,8 @@ static void	re_init_data(t_data *data)
 		* (data->height + data->z_gap) * data->zoom \
 		> (WIDTH + 10 * data->zoom) * (HEIGHT + 10 * data->zoom) / 3.0)
 	{
-		data->zoom /= 1.1;
+		if (data->zoom > 1)
+			data->zoom -= 1;
 	}
 	data->cflag = FALSE;
 	data->pflag = FALSE;
@@ -104,10 +105,10 @@ int	key_press(int keycode, t_data *data)
 		data->y_shift -= 15;
 	if (keycode == 126)
 		data->y_shift += 15;
-	if (keycode == 27)
-		data->zoom /= 1.1;
-	if (keycode == 24)
-		data->zoom *= 1.1;
+	if (keycode == 27 && data->zoom > 1)
+		data->zoom -= 1;
+	if (keycode == 24 && data->zoom < 2147483647)
+		data->zoom += 1;
 	if (keycode == 25)
 		data->zdepth /= 1.1;
 	if (keycode == 29)

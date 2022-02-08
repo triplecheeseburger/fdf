@@ -43,7 +43,8 @@ static void	init_data_sequal(t_data *data)
 		* (data->height + data->z_gap) * (int)data->zoom \
 		> (WIDTH + 20 * (int)data->zoom) * (HEIGHT + 20 * (int)data->zoom) / 3.0)
 	{
-		data->zoom /= 1.1;
+		if (data->zoom > 1)
+			data->zoom -= 1;
 	}
 }
 
