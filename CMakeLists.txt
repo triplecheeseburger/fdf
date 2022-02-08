@@ -1,29 +1,29 @@
 cmake_minimum_required(VERSION 3.21)
 project(fdf)
 
-include_directories(.)
+include_directories(./includes)
 include_directories(mlx)
-link_directories(/Users/hakim/fdf/mlx)
-link_directories(/Users/hakim/fdf/libft)
+#link_directories(/Users/hakim/fdf/mlx)
+#link_directories(/Users/hakim/fdf/libft)
+link_directories(/Users/hangyulkim/42/42cursus/2_circle/fdf/mlx)
+link_directories(/Users/hangyulkim/42/42cursus/2_circle/fdf/libft)
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_FLAGS "-Wall -Wextra -Werror -I./includes")
 
 add_executable(fdf
-        get_next_line/get_next_line.c
-        get_next_line/get_next_line_utils.c
-        parse.c
-        parse_color.c
-        fdf.c
-        temporal.c
-        utils_free.c
-        utils_map.c
-        xiaolin_wu.c
-        color.c
-        drawing_utils.c
-        drawing.c
-        prepare.c
-        projection.c
-        input_handler.c)
+        srcs/get_next_line.c
+        srcs/get_next_line_utils.c
+        srcs/parse.c
+        srcs/parse_color.c
+        srcs/fdf.c
+        srcs/utils_free.c
+        srcs/xiaolin_wu.c
+        srcs/color.c
+        srcs/drawing_utils.c
+        srcs/drawing.c
+        srcs/prepare.c
+        srcs/projection.c
+        srcs/input_handler.c)
 
 target_link_libraries (fdf mlx)
 target_link_libraries (fdf ft)
